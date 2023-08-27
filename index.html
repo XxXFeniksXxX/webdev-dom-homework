@@ -8,10 +8,16 @@
 
   <body>
     <div class="container">
+      <div id="exp" class="vis">
+        <p><center>Коментарии загружаются...</center></p>
+      </div>
       <ul id="List" class="comments">
         <!-- Рендер в js -->
       </ul>
-      <div class="add-form">
+    <div id="dob" class="vis">
+      <p><center>Коментарий добавляется...</center></p>
+    </div>
+      <div id="formaCom" class="add-form">
         <input
           id="buttonNameId"
           type="text"
@@ -32,11 +38,17 @@
     </div>
   </body>
   <style>
+    .vis{
+      display: none;
+    }
     .error{
       background-color: red;
     }
   </style>
   <script>
+    const expectationCom = document.getElementById("exp");
+    const expectation = document.getElementById("dob");
+    const buttonRtyLod = document.getElementById("formaCom");
     const ListOld = document.getElementById("List");
     const buttonName = document.getElementById("buttonNameId");
     const buttonComment = document.getElementById("buttonCommentId");
@@ -45,8 +57,43 @@
     // _________________________________________________________________
     let Comments =
     [
-      //...<-- Заполняется API -->... //
+       //...<-- Заполняется API -->... //
     ]; 
+    const expectationForm = () => {
+      
+    }
+    window.addEventListener("load", function (event) {
+      expectationCom.classList.remove("vis");
+  });
+    // ________________________API - Обработака данных__________________________
+    const ApiRenderCom = () => {
+      // expectationCom.classList.remove("vis");
+      return fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
+        method: "GET"
+      })
+      .then((response) => {
+       return response.json();
+      })
+      .then((responseData) => {
+        const appComments = responseData.comments.map((comment) => {
+        return {
+          name: comment.author.name,
+          coment: comment.text,
+          like: false,
+          date: comment.date,
+          likes: comment.likes,
+          };
+        });
+        Comments = appComments;
+        renderComments();
+        Obclick();
+        Comlick();
+      }).then((data) => {
+        expectationCom.classList.add("vis");
+      });
+    }
+      // ______________________API - END_____________________________________
+
     // _______________________Рендер____________________________________
     const renderComments = () => {
       const CommentsHtml = Comments.map((comment, index) => {
@@ -70,31 +117,9 @@
         }).join("");
         ListOld.innerHTML = CommentsHtml;
       };
+    ApiRenderCom();
     renderComments();
     // _____________________________Рендер END__________________________________
-      
-    // ________________________API - Обработака данных__________________________
-    fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
-        method: "GET"
-      }).then((response) => {
-        response.json().then((responseData) => {
-          const appComments = responseData.comments.map((comment) => {
-          return {
-            name: comment.author.name,
-            coment: comment.text,
-            like: false,
-            date: comment.date,
-            likes: comment.likes,
-            };
-          });
-          Comments = appComments;
-          renderComments();
-          Obclick();
-          Comlick();
-        });
-      })
-    // ______________________API - END_____________________________________
-
     const likesIn = () =>{
         const LikeButton = document.getElementById("likestr");
         const CommentsElements = document.querySelectorAll(".comment");
@@ -104,7 +129,7 @@
         }
       }
       likesIn();
-    // _________________________push________________________________________
+      // _________________________push________________________________________
     buttonClick.addEventListener("click", () =>{
       buttonComment.classList.remove("error");
       buttonName.classList.remove("error");
@@ -126,49 +151,37 @@
         minute: 'numeric',
         timezone: 'UTC'
       };
-  // _____________________________________POST__________________________
-    fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
-      method: "POST",
-      body: JSON.stringify({
-        text: buttonComment.value.replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;"),
-        name: buttonName.value.replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;"),
+      buttonRtyLod.classList.add("vis");
+      expectation.classList.remove("vis");
+      // _____________________________________POST__________________________
+      fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
+        method: "POST",
+        body: JSON.stringify({
+          text: buttonComment.value.replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;"),
+          name: buttonName.value.replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;"),
+        }),
       })
-    }).then((response) => {
-        response.json().then((responseData) => {
-          fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
-            method: "GET"
-          }).then((response) => {
-            response.json().then((responseData) => {
-              const appComments = responseData.comments.map((comment) => {
-                return {
-                  name: comment.author.name,
-                  coment: comment.text,
-                  like: false,
-                  date: new Date(comment.date),
-                  likes: comment.likes,
-                  };
-              });
-              Comments = appComments;
-
-              renderComments();
-              Obclick();
-              Comlick();
-            });
-          });
-        });
+      .then((response) => {
+        return response.json();
+      })
+      .then(() => {
+        return ApiRenderCom();
+      })
+      .then((data) => {
+        expectation.classList.add("vis");
+        buttonRtyLod.classList.remove("vis");
       });
       buttonName.value = "";
       buttonComment.value = "";
-      renderComments();
       Obclick();
       Comlick();
-    // __________________________POST - END__________________________________________________
+      // __________________________POST - END__________________________________________________
     });
     // __________________________Push - END__________________________________________________
     // ____________________Функции обработки лайков__________________________________________
