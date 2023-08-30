@@ -42,61 +42,69 @@
     const buttonComment = document.getElementById("buttonCommentId");
     const buttonClick = document.getElementById("buttonClick");
     const LikeButton = document.getElementById("likestr");
-    // __________________________________________
+    // _________________________________________________________________
     let Comments =
-      [{
-      name: 'Глеб Фокин',
-      coment: 'Это будет первый комментарий на этой странице',
-      like: false,
-      date: '12.02.22 12:18',
-      likes: 3,
-    },
-    {
-      name: 'Варвара Н.',
-      coment: 'Мне нравится как оформлена эта страница! ❤',
-      like: true,
-      date: '13.02.22 19:22',
-      likes: 72,
-    },
-  ]; 
-  // _____________________________________________Рендер____________________________________
-  const renderComments = () => {
-     const CommentsHtml = Comments.map((comment, index) => {
-        return `<li class="comment" data-clicker=${comment.like} data-index=${index}>
-          <div class="comment-header">
-            <div class="name">${comment.name}</div>
-            <div>${comment.date}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${comment.coment}
+    [
+      //...<-- Заполняется API -->... //
+    ]; 
+    // _______________________Рендер____________________________________
+    const renderComments = () => {
+      const CommentsHtml = Comments.map((comment, index) => {
+          return `<li class="comment" data-clicker=${comment.like} data-index=${index}>
+            <div class="comment-header">
+              <div class="name">${comment.name}</div>
+              <div>${comment.date}</div>
             </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${comment.likes}</span>
-              <button id ="likestr" class="like-button ${comment.like ? '-active-like' : ''}"></button>
+            <div class="comment-body">
+              <div class="comment-text">
+                ${comment.coment}
+              </div>
             </div>
-          </div>
-        </li>`;
-      }).join("");
-      ListOld.innerHTML = CommentsHtml;
-    };
-renderComments();
-// _____________________________________________Рендер END____________________________________
+            <div class="comment-footer">
+              <div class="likes">
+                <span class="likes-counter">${comment.likes}</span>
+                <button id ="likestr" class="like-button ${comment.like ? '-active-like' : ''}"></button>
+              </div>
+            </div>
+          </li>`;
+        }).join("");
+        ListOld.innerHTML = CommentsHtml;
+      };
+    renderComments();
+    // _____________________________Рендер END__________________________________
+      
+    // ________________________API - Обработака данных__________________________
+    fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
+        method: "GET"
+      }).then((response) => {
+        response.json().then((responseData) => {
+          const appComments = responseData.comments.map((comment) => {
+          return {
+            name: comment.author.name,
+            coment: comment.text,
+            like: false,
+            date: comment.date,
+            likes: comment.likes,
+            };
+          });
+          Comments = appComments;
+          renderComments();
+          Obclick();
+          Comlick();
+        });
+      })
+    // ______________________API - END_____________________________________
+
     const likesIn = () =>{
-      const LikeButton = document.getElementById("likestr");
-      const CommentsElements = document.querySelectorAll(".comment");
-      for (const CommentsElement of CommentsElements){
-        console.log(CommentsElement);
-      const clicker = CommentsElement.dataset.clicker;
-      const index = CommentsElement.dataset.index;
-      console.log(clicker);
-      console.log(Comments[index].like);
+        const LikeButton = document.getElementById("likestr");
+        const CommentsElements = document.querySelectorAll(".comment");
+        for (const CommentsElement of CommentsElements){
+        const clicker = CommentsElement.dataset.clicker;
+        const index = CommentsElement.dataset.index;
+        }
       }
-    }
-    likesIn();
-// ____________________push______________________________________________
+      likesIn();
+    // _________________________push________________________________________
     buttonClick.addEventListener("click", () =>{
       buttonComment.classList.remove("error");
       buttonName.classList.remove("error");
@@ -118,67 +126,96 @@ renderComments();
         minute: 'numeric',
         timezone: 'UTC'
       };
+  // _____________________________________POST__________________________
+    fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
+      method: "POST",
+      body: JSON.stringify({
+        text: buttonComment.value.replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
+        name: buttonName.value.replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
+      })
+    }).then((response) => {
+        response.json().then((responseData) => {
+          fetch("https://wedev-api.sky.pro/api/v1/egor-pavlakov/comments", {
+            method: "GET"
+          }).then((response) => {
+            response.json().then((responseData) => {
+              const appComments = responseData.comments.map((comment) => {
+                return {
+                  name: comment.author.name,
+                  coment: comment.text,
+                  like: false,
+                  date: new Date(comment.date),
+                  likes: comment.likes,
+                  };
+              });
+              Comments = appComments;
 
-      Comments.push({
-        name: buttonName.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
-        coment: buttonComment.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
-        date: new Date().toLocaleString("ru", options),
-        likes: 0,
-        like: false,
+              renderComments();
+              Obclick();
+              Comlick();
+            });
+          });
+        });
       });
       buttonName.value = "";
       buttonComment.value = "";
       renderComments();
       Obclick();
       Comlick();
-// __________________________end____________________________________________________________
-});
-     // ____________________Функции обработки лайков__________________________________________
+    // __________________________POST - END__________________________________________________
+    });
+    // __________________________Push - END__________________________________________________
+    // ____________________Функции обработки лайков__________________________________________
     const Obclick = () => {
     const CommentsElement = document.querySelectorAll(".like-button");
-    for (const CommentsElements of CommentsElement){
-      CommentsElements.addEventListener("click", () =>{
-      const CommentsElements = document.querySelectorAll(".comment");
-      for (const CommentsElementy of CommentsElements){
-      const clicker = CommentsElementy.dataset.clicker;
-      const index = CommentsElementy.dataset.index;
-    CommentsElementy.addEventListener("click", () =>{
-      if (clicker == 'true'){
-        Comments[index].like = false;
-        Comments[index].likes = Comments[index].likes - 1;
-      } else {
-        Comments[index].like = true;
-        Comments[index].likes = Comments[index].likes + 1;
-      }
-      renderComments();
-      Obclick();
-      Comlick();
-      });
+      for (const CommentsElements of CommentsElement){
+        CommentsElements.addEventListener("click", () =>{
+          const CommentsElements = document.querySelectorAll(".comment");
+          for (const CommentsElementy of CommentsElements){
+            const clicker = CommentsElementy.dataset.clicker;
+            const index = CommentsElementy.dataset.index;
+            CommentsElementy.addEventListener("click", () =>{
+              if (clicker == 'true'){
+                Comments[index].like = false;
+                Comments[index].likes = Comments[index].likes - 1;
+              } else {
+                Comments[index].like = true;
+                Comments[index].likes = Comments[index].likes + 1;
+              }
+              renderComments();
+              Obclick();
+              Comlick();
+            });
+          };
+        });
+      };
     };
-  });
+    Obclick();
+    const Comlick = () => {
+      const CopyComm = document.querySelectorAll(".comment-header, .comment-body");
+      for (const CopyComms of CopyComm){
+        CopyComms.addEventListener("click", (event) =>{
+          const Commentstiay = document.querySelectorAll(".comment");
+          for (const Commentstiays of Commentstiay){
+            const clicker = Commentstiays.dataset.clicker;
+            const index = Commentstiays.dataset.index;
+            Commentstiays.addEventListener("click", (event) =>{
+              buttonComment.value = (`>${Comments[index].coment}` + `\n${Comments[index].name}, `);
+              renderComments();
+              Obclick();
+              Comlick();
+            });
+          };
+        });
+      };
     };
-  };
-  Obclick();
-  const Comlick = () => {
-    const CopyComm = document.querySelectorAll(".comment-header, .comment-body");
-    for (const CopyComms of CopyComm){
-      CopyComms.addEventListener("click", (event) =>{
-        console.log(event);
-      const Commentstiay = document.querySelectorAll(".comment");
-      for (const Commentstiays of Commentstiay){
-      const clicker = Commentstiays.dataset.clicker;
-      const index = Commentstiays.dataset.index;
-      Commentstiays.addEventListener("click", (event) =>{
-      buttonComment.value = (`>${Comments[index].coment}` + `\n${Comments[index].name}, `);
-      renderComments();
-      Obclick();
-      Comlick();
-      });
-    };
-  });
-    };
-  };
-  Comlick();
-// ____________________end_______________________________________
+    Comlick();
+    // ____________________end_______________________________________
   </script>
 </html>
