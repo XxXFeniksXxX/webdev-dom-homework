@@ -83,8 +83,8 @@
           });
           Comments = appComments;
           renderComments();
-          Obclick();
-          Comlick();
+          ObjectClick();
+          СommentClick();
         })
         .then((data) => {
           expectationCom.classList.add("vis");
@@ -207,13 +207,13 @@
           // TODO: Отправлять в систему сбора ошибок
           console.warn(error);
         });
-      Obclick();
-      Comlick();
+      ObjectClick();
+      СommentClick();
       // __________________________POST - END__________________________________________________
     });
     // __________________________Push - END__________________________________________________
     // ____________________Функции обработки лайков__________________________________________
-    const Obclick = () => {
+    const ObjectClick = () => {
       const ClickingOnLikes = document.querySelectorAll(".like-button");
       for (const ClickHandler of ClickingOnLikes) {
         ClickHandler.addEventListener("click", () => {
@@ -230,15 +230,15 @@
                 Comments[index].likes = Comments[index].likes + 1;
               }
               renderComments();
-              Obclick();
-              Comlick();
+              ObjectClick();
+              СommentClick();
             });
           }
         });
       }
     };
-    Obclick();
-    const Comlick = () => {
+    ObjectClick();
+    const СommentClick = () => {
       const CopyComm = document.querySelectorAll(
         ".comment-header, .comment-body"
       );
@@ -252,14 +252,14 @@
               buttonComment.value =
                 `>${Comments[index].coment}` + `\n${Comments[index].name}, `;
               renderComments();
-              Obclick();
-              Comlick();
+              ObjectClick();
+              СommentClick();
             });
           }
         });
       }
     };
-    Comlick();
+    СommentClick();
     // ____________________end_______________________________________
   </script>
 </html>
