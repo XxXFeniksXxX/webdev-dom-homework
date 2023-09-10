@@ -1,10 +1,10 @@
-import { login, token, setToken } from "./api.js";
+import { login, token, setToken, setNameUser, } from "./api.js";
 
 export const renderLogin = ({ ApiRenderCom }) => {
   const appElement = document.getElementById("app");
-  const loginHTML = `<div class="form">
+  const loginHTML = `<div class="form container">
+    <div class="form-row add-form ">
     <h3 class="form-title">Форма входа</h3>
-    <div class="form-row">
       <input type="text" id="login-input" class="input" placeholder="Логин" />
       <input
         type="text"
@@ -15,7 +15,6 @@ export const renderLogin = ({ ApiRenderCom }) => {
     </div>
     <br />
     <button class="button" id="login-button">Войти</button>
-    <a href="index.html" id="link-to-login">Перейти на страницу задач</a>
   </div>
     `;
 
@@ -31,9 +30,8 @@ export const renderLogin = ({ ApiRenderCom }) => {
       password: passwordInputElement.value,
     })
       .then((responseData) => {
-        console.log(token);
         setToken(responseData.user.token);
-        console.log(token);
+        setNameUser(responseData.user.name);
       })
       .then(() => {
         ApiRenderCom();

@@ -1,4 +1,4 @@
-import { getTodos } from "./api.js";
+import { getTodos, nameUser } from "./api.js";
 import { postTodo } from "./api.js";
 import { renderLogin } from "./loginPaje.js";
 // _________________________________________________________________
@@ -7,28 +7,34 @@ let Comments = [
 ];
 // ________________________API - Обработака данных__________________________
 const ApiRenderCom = () => {
-  const expectationCom = document.getElementById("exp");
-  window.addEventListener("load", function (event) {
-    expectationCom.classList.remove("vis");
-  });
-  getTodos().then((responseData) => {
-    const appComments = responseData.comments.map((comment) => {
-      return {
-        name: comment.author.name,
-        coment: comment.text,
-        like: false,
-        date: comment.date,
-        likes: comment.likes,
+  getTodos()
+    .then((responseData) => {
+      let options = {
+        year: "2-digit",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        timezone: "UTC",
       };
+      const appComments = responseData.comments.map((comment) => {
+        return {
+          name: comment.author.name,
+          coment: comment.text,
+          like: false,
+          date: new Date().toLocaleString("ru", options),
+          likes: comment.likes,
+        };
+      });
+      Comments = appComments;
+      renderComments();
+    })
+    .then((data) => {
+      const buttonName = document.getElementById("buttonNameId");
+      buttonName.value = nameUser;
+      const expectationCom = document.getElementById("exp");
+      expectationCom.classList.add("vis");
     });
-    Comments = appComments;
-    renderComments();
-    // expectationForm();
-    console.log("asd");
-  });
-  // .then((data) => {
-  //   // expectationCom.classList.add("vis");
-  // });
 };
 // ______________________API - END_____________________________________
 
@@ -61,7 +67,7 @@ const renderComments = () => {
 
   const appHTML = `
   <div class="container">
-      <div id="exp" class="vis">
+      <div id="exp">
         <p><center>Коментарии загружаются...</center></p>
       </div>
       <ul id="List" class="comments">
@@ -72,10 +78,11 @@ const renderComments = () => {
       </div>
       <div id="formaCom" class="add-form">
         <input
+          readonly
           id="buttonNameId"
           type="text"
-          class="add-form-name"
-          placeholder="Введите ваше имя"
+          class="add-form-name namert"
+          placeholder=""
         />
         <textarea
           id="buttonCommentId"
@@ -92,6 +99,11 @@ const renderComments = () => {
     <div id="app" class="app">
     </div>`;
   appElement.innerHTML = appHTML;
+  const expectationCom = document.getElementById("exp");
+  window.addEventListener("load", function (event) {
+    console.log("sadsaddsa");
+    expectationCom.classList.remove("vis");
+  });
   const expectation = document.getElementById("dob");
   const buttonRtyLod = document.getElementById("formaCom");
   const buttonName = document.getElementById("buttonNameId");
@@ -112,14 +124,7 @@ const renderComments = () => {
       buttonComment.classList.add("error");
       return;
     }
-    let options = {
-      year: "2-digit",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      timezone: "UTC",
-    };
+    
     buttonRtyLod.classList.add("vis");
     expectation.classList.remove("vis");
     // _____________________________________POST__________________________
@@ -177,7 +182,6 @@ const renderComments = () => {
   };
   addLikeEventToComments();
   const addEditEventToComments = () => {
-    console.log("asd");
     const CopyComm = document.querySelectorAll(
       ".comment-header, .comment-body"
     );
@@ -196,5 +200,77 @@ const renderComments = () => {
   };
   addEditEventToComments();
 };
-renderLogin({ ApiRenderCom });
 // _____________________________Рендер END__________________________________
+const ApiRenderComViewPage = () => {
+  getTodos()
+    .then((responseData) => {
+      let options = {
+        year: "2-digit",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        timezone: "UTC",
+      };
+      const appComments = responseData.comments.map((comment) => {
+        return {
+          name: comment.author.name,
+          coment: comment.text,
+          like: false,
+          date: new Date().toLocaleString("ru", options),
+          likes: comment.likes,
+        };
+      });
+      Comments = appComments;
+      renderCommentsViewPage();
+    })
+    .then((data) => {
+      const expectationCom = document.getElementById("exp");
+      expectationCom.classList.add("vis");
+    });
+};
+const renderCommentsViewPage = () => {
+  const appElement = document.getElementById("app");
+  const CommentsHtml = Comments.map((comment, index) => {
+    return `<li class="comment" data-clicker=${
+      comment.like
+    } data-index=${index}>
+        <div class="comment-header">
+            <div class="name">${comment.name}</div>
+            <div>${comment.date}</div>
+        </div>
+        <div class="comment-body">
+            <div class="comment-text">
+            ${comment.coment}
+            </div>
+        </div>
+        <div class="comment-footer">
+            <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button id ="likestr" class="like-button ${
+              comment.like ? "-active-like" : ""
+            }"></button>
+            </div>
+        </div>
+        </li>`;
+  }).join("");
+
+  const appHTML = `
+  <div class="container">
+      <div id="exp">
+        <p><center>Коментарии загружаются...</center></p>
+      </div>
+      <ul id="List" class="comments">
+        ${CommentsHtml}
+      </ul>
+      <div class="Login">
+      <a id="Entrance" class="Login__link" href="#">Войти в систему</a>
+    </div>
+    </div>`;
+  appElement.innerHTML = appHTML;
+  const clickLogin = document.getElementById("Entrance");
+  clickLogin.addEventListener("click", () => {
+    renderLogin({ ApiRenderCom });
+  });
+};
+ApiRenderComViewPage();
