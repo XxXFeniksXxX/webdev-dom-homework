@@ -18,7 +18,7 @@ export const ApiRenderCom = () => {
           name: comment.author.name,
           coment: comment.text,
           like: false,
-          date: comment.date,
+          date: format(new Date(comment.date), "MM-dd-yyyy hh:mm"),
           likes: comment.likes,
         };
       });

@@ -13,7 +13,7 @@ export const ApiRenderComViewPage = () => {
           name: comment.author.name,
           coment: comment.text,
           like: false,
-          date: format(comment.date, "MM-dd-yyyy hh:mm"),
+          date: format(new Date(comment.date), "MM-dd-yyyy hh:mm"),
           likes: comment.likes,
         };
       });
