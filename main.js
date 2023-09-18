@@ -1,7 +1,6 @@
 import { getTodos, nameUser } from "./api.js";
 import { renderComments } from "./renderTask.js";
 import { ApiRenderComViewPage } from "./renderLoad.js";
-import { formatDateToRu, formatDateToUs } from "./lib/formatDate/formatDate.js";
 import { format } from "date-fns";
 const country = "ru";
 // _________________________________________________________________

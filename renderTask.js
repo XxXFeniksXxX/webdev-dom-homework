@@ -1,5 +1,6 @@
 import { postTodo, getTodos } from "./api.js";
 import { renderLogin } from "./loginPaje.js";
+import { format } from "date-fns";
 // _______________________Рендер____________________________________
 export const renderComments = ({appComments, ApiRenderCom}) => {
     const appElement = document.getElementById("app");
@@ -182,7 +183,7 @@ const ApiRenderComViewPage = () => {
             name: comment.author.name,
             coment: comment.text,
             like: false,
-            date: comment.date,
+            date: format(new Date(comment.date), "MM-dd-yyyy hh:mm"),
             likes: comment.likes,
           };
         });
