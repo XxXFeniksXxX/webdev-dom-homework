@@ -1,7 +1,7 @@
 import { getTodos, nameUser } from "./api.js";
 import { renderComments } from "./renderTask.js";
 import { ApiRenderComViewPage } from "./renderLoad.js";
-import { formatDateToRu, formatDateToUs } from "./lib/formatDate/formatDate.js"
+import { format } from "date-fns";
 const country = "ru";
 // _________________________________________________________________
 let Comments = [
@@ -17,12 +17,12 @@ export const ApiRenderCom = () => {
           name: comment.author.name,
           coment: comment.text,
           like: false,
-          date: `${country === "ru" ? formatDateToRu(new Date(task.created_at)) : formatDateToUs(new Date(task.created_at))}`,
+          date: format(new Date(comment.date), "MM-dd-yyyy hh:mm"),
           likes: comment.likes,
         };
       });
       Comments = appComments;
-      renderComments({appComments, ApiRenderCom});
+      renderComments({ appComments, ApiRenderCom });
     })
     .then((data) => {
       const buttonName = document.getElementById("buttonNameId");

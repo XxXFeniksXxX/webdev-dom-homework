@@ -1,8 +1,7 @@
 import { renderLogin } from "./loginPaje.js";
-import { postTodo, getTodos } from "./api.js";
+import { getTodos } from "./api.js";
 import { ApiRenderCom } from "./main.js";
-import { formatDateToRu, formatDateToUs } from "./lib/formatDate/formatDate.js";
-const country = "ru";
+import { format } from "date-fns";
 let Comments = [
   //...<-- Заполняется API -->... //
 ];
@@ -14,11 +13,7 @@ export const ApiRenderComViewPage = () => {
           name: comment.author.name,
           coment: comment.text,
           like: false,
-          date: `${
-            country === "ru"
-              ? formatDateToRu(new Date(comment.created_at))
-              : formatDateToUs(new Date(comment.created_at))
-          }`,
+          date: format(new Date(comment.date), "MM-dd-yyyy hh:mm"),
           likes: comment.likes,
         };
       });
